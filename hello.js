@@ -20,5 +20,15 @@ udpPort.open()
 // Send an OSC message to, say, SuperCollider
 udpPort.send({
   address: '/s_new',
-  args: ['default', 200]
+  args: [ 'ping', -1, 0, 1, 'freq', 80, 'duration', 8 ]
+}, '127.0.0.1', 57110)
+
+udpPort.send({
+  address: '/s_new',
+  args: [ 'ping', -1, 0, 1, 'freq', 80 * (3 / 2), 'duration', 2 ]
+}, '127.0.0.1', 57110)
+
+udpPort.send({
+  address: '/s_new',
+  args: [ 'ping', -1, 0, 1, 'freq', 80 * (6 / 2) * 2, 'duration', 2 ]
 }, '127.0.0.1', 57110)
