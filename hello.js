@@ -1,4 +1,5 @@
 var osc = require('osc')
+var R = require('ramda')
 
 console.log('starting')
 
@@ -17,24 +18,27 @@ udpPort.on('bundle', function (oscBundle, timeTag, info) {
 // Open the socket.
 udpPort.open()
 
+var pingBundle = function (pingPairs) {
+  return R.map(
+    function (pingPair) {
+        return {
+          address: '/s_new',
+          args: [ 'ping', -1, 0, 1, 'freq', pingPair[0], 'duration', pingPair[1] ]
+        }
+    },
+    pingPairs
+  )
+}
+
 var klang = function (n) {
   udpPort.send(
     {
       timeTag: osc.timeTag(n),
-      packets: [
-        {
-          address: '/s_new',
-          args: [ 'ping', -1, 0, 1, 'freq', 80, 'duration', 8 ]
-        },
-        {
-          address: '/s_new',
-          args: [ 'ping', -1, 0, 1, 'freq', 80 * (3 / 2), 'duration', 2 ]
-        },
-        {
-          address: '/s_new',
-          args: [ 'ping', -1, 0, 1, 'freq', 80 * (6 / 2) * 2, 'duration', 2 ]
-        }
-      ]
+      packets: pingBundle([
+        [440 * 1 / 4, 8],
+        [440 * 2 / 4, 6],
+        [440 * 3 / 8, 4]
+      ])
     },
     '127.0.0.1',
     57110
