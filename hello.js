@@ -1,5 +1,6 @@
 var osc = require('osc')
 var R = require('ramda')
+var midiutils = require('midiutils')
 
 console.log('starting')
 
@@ -18,26 +19,33 @@ udpPort.on('bundle', function (oscBundle, timeTag, info) {
 // Open the socket.
 udpPort.open()
 
+var ping = function (note, duration) {
+  return {
+    address: '/s_new',
+    args: [ 'ping', -1, 0, 1, 'freq', midiutils.noteNumberToFrequency(note), 'duration', duration ]
+  }
+}
+
 var pingBundle = function (pingPairs) {
   return R.map(
     function (pingPair) {
-        return {
-          address: '/s_new',
-          args: [ 'ping', -1, 0, 1, 'freq', pingPair[0], 'duration', pingPair[1] ]
-        }
+      return ping(pingPair[0], pingPair[1])
     },
     pingPairs
   )
 }
+
+var root = 50
 
 var klang = function (n) {
   udpPort.send(
     {
       timeTag: osc.timeTag(n),
       packets: pingBundle([
-        [440 * 1 / 4, 8],
-        [440 * 2 / 4, 6],
-        [440 * 3 / 8, 4]
+        [root + 0, 16],
+        [root + 4, 8],
+        [root + 7, 4],
+        [root + 9, 16]
       ])
     },
     '127.0.0.1',
